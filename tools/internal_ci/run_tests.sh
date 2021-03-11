@@ -18,8 +18,16 @@ run_tests() {
   local -a TEST_FLAGS=( --strategy=TestRunner=standalone --test_output=all )
   readonly TEST_FLAGS
   (
+    echo "Building..."
     time bazel build --features=-debug_prefix_map_pwd_is_dot -- ... || fail_with_debug_output
+    echo "Running tests..."
     time bazel test --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+    echo "Runnin ASAN tests..."
+    time bazel test --config=asan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+    echo "Running MSAN tests..."
+    time bazel test --config=msan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+    echo "Runnin TSAN tests..."
+    time bazel test --config=tsan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
   )
 }
 

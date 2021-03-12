@@ -29,8 +29,10 @@ cc_library(
         "hkdf.cc",
     ],
     hdrs = ["hkdf.h"],
+    external_deps = [
+        "libssl",
+    ],
     deps = [
-        "@boringssl//:crypto",
         "@com_google_absl//absl/status",
     ],
 )
@@ -47,9 +49,11 @@ cc_library(
         "s2a_aead_constants.h",
         "s2a_aead_crypter.h",
     ],
+    external_deps = [
+        "libssl",
+    ],
     deps = [
         ":s2a_aead_crypter_util",
-        "@boringssl//:crypto",
         "@com_google_absl//absl/memory",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
@@ -63,8 +67,8 @@ cc_library(
         "s2a_aead_crypter_util.cc",
     ],
     hdrs = ["s2a_aead_crypter_util.h"],
-    deps = [
-        "@boringssl//:crypto",
+    external_deps = [
+        "libssl",
     ],
 )
 
@@ -127,10 +131,11 @@ cc_test(
     srcs = [
         "s2a_aead_crypter_util_test.cc",
     ],
+    external_deps = [
+        "libssl",
+    ],
     deps = [
         ":s2a_aead_crypter_util",
-        "@boringssl//:crypto",
-        "@boringssl//:ssl",
         "@com_google_googletest//:gtest_main",
     ],
 )

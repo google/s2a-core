@@ -46,13 +46,14 @@ cc_library(
 cc_test(
     name = "s2a_frame_protector_test",
     srcs = ["s2a_frame_protector_test.cc"],
+    external_deps = [
+        "libssl",
+    ],
     deps = [
         ":s2a_frame_protector",
         "//:s2a_constants",
         "//record_protocol:s2a_crypter",
         "//test_util:s2a_test_data",
-        "@boringssl//:crypto",
-        "@boringssl//:ssl",
         "@com_google_absl//absl/status:statusor",
         "@com_google_googletest//:gtest_main",
     ],

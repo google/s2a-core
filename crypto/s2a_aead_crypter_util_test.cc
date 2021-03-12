@@ -18,10 +18,11 @@
 
 #include "crypto/s2a_aead_crypter_util.h"
 
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "openssl/err.h"
-#include "openssl/ssl.h"
 
 namespace s2a {
 namespace aead_crypter {

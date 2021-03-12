@@ -16,9 +16,9 @@
  *
  */
 
-#include "crypto/s2a_aead_crypter_util.h"
+#include <openssl/bio.h>
 
-#include "openssl/bio.h"
+#include "crypto/s2a_aead_crypter_util.h"
 
 namespace s2a {
 namespace aead_crypter {

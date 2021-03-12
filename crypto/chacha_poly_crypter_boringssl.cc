@@ -22,13 +22,14 @@
 
 #include <vector>
 
+#include <openssl/aead.h>
+#include <openssl/bio.h>
+
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_util.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/substitute.h"
-#include "openssl/aead.h"
-#include "openssl/bio.h"
 
 namespace s2a {
 namespace aead_crypter {

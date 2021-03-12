@@ -18,15 +18,16 @@
 
 #include <memory>
 
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
+
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_util.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
-#include "openssl/bio.h"
-#include "openssl/buffer.h"
-#include "openssl/err.h"
-#include "openssl/evp.h"
-#include "openssl/hmac.h"
 
 namespace s2a {
 namespace aead_crypter {

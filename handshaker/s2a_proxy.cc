@@ -54,7 +54,7 @@ std::unique_ptr<S2AProxy> S2AProxy::Create(S2AProxyOptions& options) {
   if (options.logger == nullptr || options.options == nullptr) {
     return nullptr;
   }
-  std::cout << "********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
+  std::cout << "*********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
   return absl::WrapUnique(new S2AProxy(
       options.logger, options.is_client, options.application_protocol,
       options.target_hostname, std::move(options.options),

@@ -16,14 +16,13 @@
  *
  */
 
-#include "openssl/base.h"
+#include <openssl/base.h>
 
 #ifdef OPENSSL_IS_BORINGSSL
 
 #include <vector>
 
-#include <openssl/aead.h>
-#include <openssl/bio.h>
+#include <openssl/aead.h> // aead.h is a BoringSSL-specific header.
 
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_util.h"

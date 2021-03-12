@@ -36,7 +36,7 @@ TEST(GetSSLErrorsTest, SSLErrorEmpty) {
 }
 
 TEST(GetSSLErrorsTest, SSLErrorNotEmpty) {
-  OPENSSL_PUT_ERROR(SSL, SSL_R_SSL_HANDSHAKE_FAILURE);
+  ERR_put_error(SSL, SSL_R_SSL_HANDSHAKE_FAILURE);
 
   std::string error = GetSSLErrors();
   EXPECT_TRUE(!error.empty());

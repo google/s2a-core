@@ -54,7 +54,7 @@ std::unique_ptr<S2AProxy> S2AProxy::Create(S2AProxyOptions& options) {
   if (options.logger == nullptr || options.options == nullptr) {
     return nullptr;
   }
-  std::cout << "**********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
+  std::cerr << "**********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
   return absl::WrapUnique(new S2AProxy(
       options.logger, options.is_client, options.application_protocol,
       options.target_hostname, std::move(options.options),
@@ -81,7 +81,7 @@ S2AProxy::S2AProxy(
       selected_local_identity_(
           absl::UnknownError("No local identity has been selected.")) {
         if (options_ != nullptr) {
-std::cout << "********************In |S2AProxy| constructor, hs service url is " << options_->handshaker_service_url() << std::endl;
+std::cerr << "********************In |S2AProxy| constructor, hs service url is " << options_->handshaker_service_url() << std::endl;
           }
         }
 
@@ -766,7 +766,7 @@ S2AProxy::CreateFrameProtector() {
                   "Handshake is not finished.");
   }
   if (options_ != nullptr) {
-    std::cout << "************In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
+    std::cerr << "************In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
   }
   S2AFrameProtectorOptions options = {result_->tls_version,
                                       result_->ciphersuite,

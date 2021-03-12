@@ -16,7 +16,7 @@
  *
  */
 
-#include <openssl/base.h>
+#include <openssl/opensslv.h>
 
 #ifdef OPENSSL_IS_BORINGSSL
 

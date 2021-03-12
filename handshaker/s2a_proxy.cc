@@ -19,6 +19,7 @@
 #include "handshaker/s2a_proxy.h"
 
 #include <cstddef>
+#include <iostream>
 
 #include "handshaker/s2a_util.h"
 #include "proto/common.upb.h"
@@ -53,6 +54,7 @@ std::unique_ptr<S2AProxy> S2AProxy::Create(S2AProxyOptions& options) {
   if (options.logger == nullptr || options.options == nullptr) {
     return nullptr;
   }
+  std::cout << "********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
   return absl::WrapUnique(new S2AProxy(
       options.logger, options.is_client, options.application_protocol,
       options.target_hostname, std::move(options.options),
@@ -77,7 +79,11 @@ S2AProxy::S2AProxy(
       channel_options_(std::move(channel_options)),
       token_manager_(std::move(token_manager)),
       selected_local_identity_(
-          absl::UnknownError("No local identity has been selected.")) {}
+          absl::UnknownError("No local identity has been selected.")) {
+        if (options_ != nullptr) {
+std::cout << "********************In |S2AProxy| constructor, hs service url is " << options_->handshaker_service_url() << std::endl;
+          }
+        }
 
 // |PopulateTokenCache| is called each time the |S2AProxy| needs to create a
 // |SessionReq| message to send to S2A. It populates |token_cache_| with tokens
@@ -759,13 +765,16 @@ S2AProxy::CreateFrameProtector() {
     return Status(StatusCode::kFailedPrecondition,
                   "Handshake is not finished.");
   }
+  if (options_ != nullptr) {
+    std::cout << "***********In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
+  }
   S2AFrameProtectorOptions options = {result_->tls_version,
                                       result_->ciphersuite,
                                       result_->in_traffic_secret,
                                       result_->out_traffic_secret,
                                       result_->in_sequence,
                                       result_->out_sequence,
-                                      options_->handshaker_service_url(),
+                                      std::string(options_->handshaker_service_url()),
                                       result_->local_identity,
                                       result_->connection_id,
                                       std::move(channel_factory_),

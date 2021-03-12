@@ -865,6 +865,7 @@ TEST(S2AProxyTest, GetBytesForPeerWithHandshakeFinished) {
         /*channel_factory=*/nullptr,
         /*channel_options=*/nullptr,
         absl::make_unique<FakeAccessTokenManager>()};
+    std::cout << "**********After creating |options| in the test, hs url is " << options.options->handshaker_service_url() << std::endl;
     auto proxy = S2AProxy::Create(options);
     ASSERT_NE(proxy, nullptr) << tests[i].description;
 

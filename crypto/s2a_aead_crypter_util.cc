@@ -16,6 +16,7 @@
  *
  */
 
+#include <openssl/base.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 

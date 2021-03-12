@@ -50,9 +50,12 @@ install_protoc() {
 }
 
 main() {
+  echo "*************Using new test script"
+
   if [[ -n "${KOKORO_ROOT}" ]]; then
     use_bazel.sh latest
     install_protoc
+    sudo apt install libssl-dev
   fi
 
   echo "using bazel binary: $(which bazel)"

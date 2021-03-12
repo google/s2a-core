@@ -768,13 +768,14 @@ S2AProxy::CreateFrameProtector() {
   if (options_ != nullptr) {
     std::cerr << "************In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
   }
+  std::string s2a_address = options_->handshaker_service_url();
   S2AFrameProtectorOptions options = {result_->tls_version,
                                       result_->ciphersuite,
                                       result_->in_traffic_secret,
                                       result_->out_traffic_secret,
                                       result_->in_sequence,
                                       result_->out_sequence,
-                                      std::string(options_->handshaker_service_url()),
+                                      s2a_address,
                                       result_->local_identity,
                                       result_->connection_id,
                                       std::move(channel_factory_),

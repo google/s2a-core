@@ -27,14 +27,11 @@ namespace aead_crypter {
 std::string GetSSLErrors() {
   BIO* bio = BIO_new(BIO_s_mem());
   ERR_print_errors(bio);
-  BUF_MEM* mem = nullptr;
-  std::string error_msg;
-  BIO_get_mem_ptr(bio, &mem);
-  if (mem != nullptr) {
-    error_msg.assign(mem->data, mem->length);
-  }
+  char* temp_buffer = nullptr;
+  size_t temp_buffer_length = BIO_get_mem_data(bio, &temp_buffer);
+  std::string error_message(temp_buffer, temp_buffer_length);
   BIO_free_all(bio);
-  return error_msg;
+  return error_message;
 }
 
 }  // namespace aead_crypter

@@ -20,9 +20,9 @@
 
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_test_util.h"
-#include "test_util/s2a_test_util.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "test_util/s2a_test_util.h"
 
 namespace s2a {
 namespace aead_crypter {
@@ -107,6 +107,9 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, EncryptionFailure) {
   auto crypter = std::move(absl::get<1>(crypter_status));
   ASSERT_NE(crypter, nullptr);
 
+// Only perform this test when not running on Windows or Fuchsia OS, because
+// |testing::KilledBySignal| is not defined for those OS.
+#if !GTEST_OS_WINDOWS && !GTEST_OS_FUCHSIA
   // Ciphertext and tag buffer is nullptr.
   Iovec nullptr_ciphertext_and_tag = {/*iov_base=*/nullptr, /*iov_len=*/0};
   // Triggers |ABSL_ASSERT| which raises SIGABRT (signal 6).
@@ -117,6 +120,7 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, EncryptionFailure) {
                              /*plaintext=*/{}, nullptr_ciphertext_and_tag);
       },
       ::testing::KilledBySignal(6), "");
+#endif
 
   std::vector<uint8_t> ciphertext_buf(
       crypter->MaxCiphertextAndTagLength(/*plaintext_length=*/0));
@@ -194,6 +198,9 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
   auto crypter = std::move(absl::get<1>(crypter_status));
   ASSERT_NE(crypter, nullptr);
 
+// Only perform this test when not running on Windows or Fuchsia OS, because
+// |testing::KilledBySignal| is not defined for those OS.
+#if !GTEST_OS_WINDOWS && !GTEST_OS_FUCHSIA
   // Plaintext buffer is nullptr.
   Iovec nullptr_plaintext = {/*iov_base=*/nullptr, /*iov_len=*/1};
   // Triggers |ABSL_ASSERT| which raises SIGABRT (signal 6).
@@ -204,6 +211,7 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
                              /*ciphertext_and_tag=*/{}, nullptr_plaintext);
       },
       ::testing::KilledBySignal(6), "");
+#endif
 
   std::vector<uint8_t> plaintext_buf(crypter->MaxPlaintextLength(
       /*ciphertext_and_tag_length=*/RFC7539_test_vec1_ciphertext.size()));

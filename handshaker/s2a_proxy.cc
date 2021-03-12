@@ -20,13 +20,13 @@
 
 #include <cstddef>
 
+#include "absl/memory/memory.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/str_format.h"
 #include "handshaker/s2a_util.h"
 #include "proto/common.upb.h"
 #include "proto/s2a.upb.h"
 #include "s2a_constants.h"
-#include "absl/memory/memory.h"
-#include "absl/status/statusor.h"
-#include "absl/strings/str_format.h"
 #include "upb/upb.hpp"
 
 namespace s2a {
@@ -759,13 +759,14 @@ S2AProxy::CreateFrameProtector() {
     return Status(StatusCode::kFailedPrecondition,
                   "Handshake is not finished.");
   }
+  std::string s2a_address = options_->handshaker_service_url();
   S2AFrameProtectorOptions options = {result_->tls_version,
                                       result_->ciphersuite,
                                       result_->in_traffic_secret,
                                       result_->out_traffic_secret,
                                       result_->in_sequence,
                                       result_->out_sequence,
-                                      options_->handshaker_service_url(),
+                                      s2a_address,
                                       result_->local_identity,
                                       result_->connection_id,
                                       std::move(channel_factory_),

@@ -21,11 +21,11 @@
 #include <algorithm>
 #include <cmath>
 
+#include "absl/strings/str_format.h"
 #include "record_protocol/s2a_crypter.h"
 #include "record_protocol/s2a_crypter_util.h"
 #include "record_protocol/s2a_ticket_sender.h"
 #include "s2a_constants.h"
-#include "absl/strings/str_format.h"
 
 namespace s2a {
 

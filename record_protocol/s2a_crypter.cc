@@ -22,12 +22,12 @@
 #include <memory>
 #include <vector>
 
+#include "absl/base/macros.h"
+#include "absl/strings/str_format.h"
 #include "crypto/hkdf.h"
 #include "crypto/s2a_aead_crypter.h"
 #include "record_protocol/s2a_crypter_util.h"
 #include "s2a_constants.h"
-#include "absl/base/macros.h"
-#include "absl/strings/str_format.h"
 
 namespace s2a {
 

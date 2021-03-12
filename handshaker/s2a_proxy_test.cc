@@ -20,14 +20,14 @@
 
 #include <iostream>
 
+#include "absl/status/status.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "handshaker/s2a_context.h"
 #include "proto/common.upb.h"
 #include "proto/s2a.upb.h"
 #include "s2a_constants.h"
 #include "token_manager/fake_access_token_manager.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "absl/status/status.h"
 #include "upb/upb.hpp"
 
 namespace s2a {

@@ -16,7 +16,9 @@
  *
  */
 
+extern "C" {
 #include <openssl/opensslv.h>
+}
 
 #ifndef OPENSSL_IS_BORINGSSL
 

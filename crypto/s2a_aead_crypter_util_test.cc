@@ -18,8 +18,10 @@
 
 #include "crypto/s2a_aead_crypter_util.h"
 
+extern "C" {
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+}
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

@@ -18,8 +18,10 @@
 
 #include "crypto/hkdf.h"
 
+extern "C" {
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+}
 
 namespace s2a {
 namespace hkdf {

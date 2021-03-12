@@ -20,9 +20,9 @@
 
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_test_util.h"
-#include "test_util/s2a_test_util.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "test_util/s2a_test_util.h"
 
 namespace s2a {
 namespace aead_crypter {
@@ -107,7 +107,7 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, EncryptionFailure) {
   auto crypter = std::move(absl::get<1>(crypter_status));
   ASSERT_NE(crypter, nullptr);
 
-// Only perform this test when not running on Windows or Fuchsia, because
+// Only perform this test when not running on Windows or Fuchsia OS, because
 // |testing::KilledBySignal| is not defined for those OS.
 #if !GTEST_OS_WINDOWS && !GTEST_OS_FUCHSIA
   // Ciphertext and tag buffer is nullptr.
@@ -198,7 +198,7 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
   auto crypter = std::move(absl::get<1>(crypter_status));
   ASSERT_NE(crypter, nullptr);
 
-// Only perform this test when not running on Windows or Fuchsia, because
+// Only perform this test when not running on Windows or Fuchsia OS, because
 // |testing::KilledBySignal| is not defined for those OS.
 #if !GTEST_OS_WINDOWS && !GTEST_OS_FUCHSIA
   // Plaintext buffer is nullptr.

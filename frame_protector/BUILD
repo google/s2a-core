@@ -46,9 +46,6 @@ cc_library(
 cc_test(
     name = "s2a_frame_protector_test",
     srcs = ["s2a_frame_protector_test.cc"],
-    external_deps = [
-        "libssl",
-    ],
     deps = [
         ":s2a_frame_protector",
         "//:s2a_constants",

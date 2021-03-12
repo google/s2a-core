@@ -766,7 +766,7 @@ S2AProxy::CreateFrameProtector() {
                   "Handshake is not finished.");
   }
   if (options_ != nullptr) {
-    std::cout << "***********In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
+    std::cout << "************In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
   }
   S2AFrameProtectorOptions options = {result_->tls_version,
                                       result_->ciphersuite,

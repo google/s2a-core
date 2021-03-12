@@ -17,6 +17,7 @@
  */
 
 #include <openssl/bio.h>
+#include <openssl/err.h>
 
 #include "crypto/s2a_aead_crypter_util.h"
 

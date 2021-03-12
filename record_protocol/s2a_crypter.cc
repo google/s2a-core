@@ -21,14 +21,13 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
-#include <iostream>
 
+#include "absl/base/macros.h"
+#include "absl/strings/str_format.h"
 #include "crypto/hkdf.h"
 #include "crypto/s2a_aead_crypter.h"
 #include "record_protocol/s2a_crypter_util.h"
 #include "s2a_constants.h"
-#include "absl/base/macros.h"
-#include "absl/strings/str_format.h"
 
 namespace s2a {
 
@@ -205,8 +204,6 @@ absl::variant<Status, std::unique_ptr<S2ACrypter>> S2ACrypter::Create(
     std::function<void(const std::string&)> logger) {
   // Input checks.
   if (handshaker_service_url.empty()) {
-    std::cerr << "*********FAILED EMPTY CHECK IN |S2ACrypter::Create|" << std::endl;
-    std::cerr << "*********In |S2ACrypter::Create|, hs url is " << handshaker_service_url << std::endl;
     return Status(StatusCode::kInvalidArgument,
                   "|handshaker_service_url| is empty.");
   }

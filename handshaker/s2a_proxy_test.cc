@@ -20,14 +20,14 @@
 
 #include <iostream>
 
+#include "absl/status/status.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "handshaker/s2a_context.h"
 #include "proto/common.upb.h"
 #include "proto/s2a.upb.h"
 #include "s2a_constants.h"
 #include "token_manager/fake_access_token_manager.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "absl/status/status.h"
 #include "upb/upb.hpp"
 
 namespace s2a {
@@ -865,7 +865,6 @@ TEST(S2AProxyTest, GetBytesForPeerWithHandshakeFinished) {
         /*channel_factory=*/nullptr,
         /*channel_options=*/nullptr,
         absl::make_unique<FakeAccessTokenManager>()};
-    std::cerr << "**********After creating |options| in the test, hs url is " << options.options->handshaker_service_url() << std::endl;
     auto proxy = S2AProxy::Create(options);
     ASSERT_NE(proxy, nullptr) << tests[i].description;
 

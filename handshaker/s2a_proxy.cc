@@ -19,15 +19,14 @@
 #include "handshaker/s2a_proxy.h"
 
 #include <cstddef>
-#include <iostream>
 
+#include "absl/memory/memory.h"
+#include "absl/status/statusor.h"
+#include "absl/strings/str_format.h"
 #include "handshaker/s2a_util.h"
 #include "proto/common.upb.h"
 #include "proto/s2a.upb.h"
 #include "s2a_constants.h"
-#include "absl/memory/memory.h"
-#include "absl/status/statusor.h"
-#include "absl/strings/str_format.h"
 #include "upb/upb.hpp"
 
 namespace s2a {
@@ -54,7 +53,6 @@ std::unique_ptr<S2AProxy> S2AProxy::Create(S2AProxyOptions& options) {
   if (options.logger == nullptr || options.options == nullptr) {
     return nullptr;
   }
-  std::cerr << "**********************In |S2AProxy::Create|, hs service url is " << options.options->handshaker_service_url() << std::endl;
   return absl::WrapUnique(new S2AProxy(
       options.logger, options.is_client, options.application_protocol,
       options.target_hostname, std::move(options.options),
@@ -79,11 +77,7 @@ S2AProxy::S2AProxy(
       channel_options_(std::move(channel_options)),
       token_manager_(std::move(token_manager)),
       selected_local_identity_(
-          absl::UnknownError("No local identity has been selected.")) {
-        if (options_ != nullptr) {
-std::cerr << "********************In |S2AProxy| constructor, hs service url is " << options_->handshaker_service_url() << std::endl;
-          }
-        }
+          absl::UnknownError("No local identity has been selected.")) {}
 
 // |PopulateTokenCache| is called each time the |S2AProxy| needs to create a
 // |SessionReq| message to send to S2A. It populates |token_cache_| with tokens
@@ -764,9 +758,6 @@ S2AProxy::CreateFrameProtector() {
     logger_("Handshake is not finished.");
     return Status(StatusCode::kFailedPrecondition,
                   "Handshake is not finished.");
-  }
-  if (options_ != nullptr) {
-    std::cerr << "************In CreateFrameProtector, hs url is " << options_->handshaker_service_url() << std::endl;
   }
   std::string s2a_address = options_->handshaker_service_url();
   S2AFrameProtectorOptions options = {result_->tls_version,

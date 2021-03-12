@@ -20,12 +20,12 @@
 
 #include <vector>
 
+#include "absl/status/statusor.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "record_protocol/s2a_crypter_util.h"
 #include "s2a_constants.h"
 #include "test_util/s2a_test_data.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "absl/status/statusor.h"
 
 namespace s2a {
 namespace frame_protector {
@@ -125,13 +125,14 @@ TEST(S2AFrameProtectorFailTest, CreateFailsBecauseAllocatorIsNullptr) {
       s2a_options::S2AOptions::Identity::FromHostname(kTestLocalIdentity);
   std::vector<uint8_t> traffic_secret(
       CiphersuiteToHashLength(Ciphersuite::AES_128_GCM_SHA256), 0x6b);
+  std::string s2a_address = kS2AHandshakerServiceUrl;
   S2AFrameProtectorOptions options = {TlsVersion::TLS1_3,
                                       Ciphersuite::AES_128_GCM_SHA256,
                                       traffic_secret,
                                       traffic_secret,
                                       /*in_sequence=*/0,
                                       /*out_sequence=*/0,
-                                      kS2AHandshakerServiceUrl,
+                                      s2a_address,
                                       local_identity,
                                       kTestConnectionId,
                                       /*channel_factory=*/nullptr,
@@ -153,13 +154,14 @@ TEST(S2AFrameProtectorFailTest, CreateFailsBecauseDestroyIsNullptr) {
       s2a_options::S2AOptions::Identity::FromHostname(kTestLocalIdentity);
   std::vector<uint8_t> traffic_secret(
       CiphersuiteToHashLength(Ciphersuite::AES_128_GCM_SHA256), 0x6b);
+  std::string s2a_address = kS2AHandshakerServiceUrl;
   S2AFrameProtectorOptions options = {TlsVersion::TLS1_3,
                                       Ciphersuite::AES_128_GCM_SHA256,
                                       traffic_secret,
                                       traffic_secret,
                                       /*in_sequence=*/0,
                                       /*out_sequence=*/0,
-                                      kS2AHandshakerServiceUrl,
+                                      s2a_address,
                                       local_identity,
                                       kTestConnectionId,
                                       /*channel_factory=*/nullptr,
@@ -181,6 +183,7 @@ TEST(S2AFrameProtectorFailTest, CreateFailsBecauseLoggerIsNullptr) {
       s2a_options::S2AOptions::Identity::FromHostname(kTestLocalIdentity);
   std::vector<uint8_t> traffic_secret(
       CiphersuiteToHashLength(Ciphersuite::AES_128_GCM_SHA256), 0x6b);
+  std::string s2a_address = kS2AHandshakerServiceUrl;
   S2AFrameProtectorOptions options = {
       TlsVersion::TLS1_3,
       Ciphersuite::AES_128_GCM_SHA256,
@@ -188,7 +191,7 @@ TEST(S2AFrameProtectorFailTest, CreateFailsBecauseLoggerIsNullptr) {
       traffic_secret,
       /*in_sequence=*/0,
       /*out_sequence=*/0,
-      kS2AHandshakerServiceUrl,
+      s2a_address,
       local_identity,
       kTestConnectionId,
       /*channel_factory=*/nullptr,
@@ -242,13 +245,14 @@ class S2AFrameProtectorTest : public ::testing::TestWithParam<Ciphersuite> {
         s2a_options::S2AOptions::Identity::FromHostname(kTestLocalIdentity);
     std::vector<uint8_t> traffic_secret(CiphersuiteToHashLength(GetParam()),
                                         0x6b);
+    std::string s2a_address = kS2AHandshakerServiceUrl;
     S2AFrameProtectorOptions options = {TlsVersion::TLS1_3,
                                         GetParam(),
                                         traffic_secret,
                                         traffic_secret,
                                         /*in_sequence=*/0,
                                         /*out_sequence=*/0,
-                                        kS2AHandshakerServiceUrl,
+                                        s2a_address,
                                         local_identity,
                                         kTestConnectionId,
                                         /*channel_factory=*/nullptr,

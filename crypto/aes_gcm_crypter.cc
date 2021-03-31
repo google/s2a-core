@@ -17,16 +17,16 @@
  */
 
 #include <memory>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_util.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
-#include "openssl/bio.h"
-#include "openssl/buffer.h"
-#include "openssl/err.h"
-#include "openssl/evp.h"
-#include "openssl/hmac.h"
 
 namespace s2a {
 namespace aead_crypter {
@@ -97,7 +97,36 @@ static Status DecryptCheckTagAndFinalize(EVP_CIPHER_CTX* ctx, Iovec tag,
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-static Status SetAad(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+static Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+  ABSL_ASSERT(ctx != nullptr);
+  for (auto& vec : aad) {
+    // If |vec| has no content, proceed to the next |Iovec|. If the length of
+    // |vec| is nonzero, then |vec.iov_base| must not be nullptr.
+    if (vec.iov_len == 0) {
+      continue;
+    }
+    if (vec.iov_base == nullptr) {
+      return Status(StatusCode::kInvalidArgument,
+                    "Non-zero aad length but aad is nullptr.");
+    }
+
+    size_t aad_bytes_read = 0;
+    if (!EVP_EncryptUpdate(ctx, /*out=*/nullptr,
+                           reinterpret_cast<int*>(&aad_bytes_read),
+                           static_cast<uint8_t*>(vec.iov_base),
+                           static_cast<int>(vec.iov_len)) ||
+        aad_bytes_read != vec.iov_len) {
+      return Status(
+          StatusCode::kInternal,
+          "Setting authenticated associated data failed. " + GetSSLErrors());
+    }
+  }
+  return Status();
+}
+
+// Sets the authentication data of |ctx| using |aad|. The caller must not pass
+// in nullptr for |ctx|.
+static Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of
@@ -148,7 +177,7 @@ class AesGcmS2AAeadCrypter : public S2AAeadCrypter {
     }
 
     // Set the authentication data using |aad|.
-    Status aad_status = SetAad(ctx_.get(), aad);
+    Status aad_status = SetAadForEncrypt(ctx_.get(), aad);
     if (!aad_status.ok()) {
       return CrypterStatus(aad_status, /*bytes_written=*/0);
     }
@@ -267,7 +296,7 @@ class AesGcmS2AAeadCrypter : public S2AAeadCrypter {
     }
 
     // Set the authentication data using |aad|.
-    Status aad_status = SetAad(ctx_.get(), aad);
+    Status aad_status = SetAadForDecrypt(ctx_.get(), aad);
     if (!aad_status.ok()) {
       return CrypterStatus(aad_status, /*bytes_written=*/0);
     }

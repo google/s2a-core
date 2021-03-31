@@ -40,7 +40,7 @@ cc_library(
     srcs = [
         "aes_gcm_crypter.cc",
         "chacha_poly_crypter_boringssl.cc",
-        "chacha_poly_crypter_openssl.cc",
+        #"chacha_poly_crypter_openssl.cc",
         "s2a_aead_crypter.cc",
     ],
     hdrs = [
@@ -174,6 +174,27 @@ configure_make(
 )
 
 cc_library(
+    name = "aes_gcm_crypter_openssl",
+    testonly = 1,
+    srcs = [
+        "aes_gcm_crypter.cc",
+        "s2a_aead_crypter.cc",
+    ],
+    hdrs = [
+        "s2a_aead_constants.h",
+        "s2a_aead_crypter.h",
+    ],
+    deps = [
+        ":openssl",
+        ":s2a_aead_crypter_util",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:variant",
+    ],
+)
+
+cc_library(
     name = "chacha_poly_crypter_openssl",
     testonly = 1,
     srcs = [
@@ -190,6 +211,17 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:variant",
+    ],
+)
+
+cc_test(
+    name = "aes_gcm_crypter_openssl_test",
+    srcs = ["aes_gcm_crypter_test.cc"],
+    deps = [
+        ":aes_gcm_crypter_openssl",
+        ":s2a_aead_crypter_test_util",
+        "//test_util:s2a_test_util",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

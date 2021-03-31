@@ -50,14 +50,14 @@ std::string GetSSLErrors() {
 absl::Status EncryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
                                           const std::vector<uint8_t>& nonce) {
   ABSL_ASSERT(ctx != nullptr);
-  if (nonce.size() != kAesGcmNonceSize) {
+  if (nonce.size() != kChachaPolyNonceSize) {
     return absl::Status(absl::StatusCode::kInvalidArgument,
-                        "|nonce| does not have the correct length.");
+                        "|nonce| has invalid length.");
   }
   if (!EVP_EncryptInit_ex(ctx, /*cipher=*/nullptr, /*impl=*/nullptr,
                           /*key=*/nullptr, nonce.data())) {
     return absl::Status(absl::StatusCode::kInternal,
-                        "Initializing AES-GCM nonce failed. " + GetSSLErrors());
+                        "Initializing Chacha-Poly nonce failed. " + GetSSLErrors());
   }
   return absl::Status();
 }
@@ -67,14 +67,14 @@ absl::Status EncryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
 absl::Status DecryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
                                           const std::vector<uint8_t>& nonce) {
   ABSL_ASSERT(ctx != nullptr);
-  if (nonce.size() != kAesGcmNonceSize) {
+  if (nonce.size() != kChachaPolyNonceSize) {
     return absl::Status(absl::StatusCode::kInvalidArgument,
-                        "|nonce| does not have the correct length.");
+                        "|nonce| has invalid length.");
   }
   if (!EVP_DecryptInit_ex(ctx, /*cipher=*/nullptr, /*impl=*/nullptr,
                           /*key=*/nullptr, nonce.data())) {
     return absl::Status(absl::StatusCode::kInternal,
-                        "Initializing AES-GCM nonce failed. " + GetSSLErrors());
+                        "Initializing ChachaPoly nonce failed. " + GetSSLErrors());
   }
   return absl::Status();
 }
@@ -85,7 +85,7 @@ absl::Status DecryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
 absl::Status DecryptCheckTagAndFinalize(EVP_CIPHER_CTX* ctx, Iovec tag,
                                         Iovec plaintext) {
   ABSL_ASSERT(ctx != nullptr);
-  ABSL_ASSERT(tag.iov_len == kAesGcmTagSize);
+  ABSL_ASSERT(tag.iov_len == kChachaPolyTagSize);
   if (!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, kAesGcmTagSize,
                            tag.iov_base)) {
     memset(plaintext.iov_base, 0x00, plaintext.iov_len);
@@ -109,7 +109,7 @@ absl::Status DecryptCheckTagAndFinalize(EVP_CIPHER_CTX* ctx, Iovec tag,
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-absl::Status SetAad(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+absl::Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of
@@ -119,7 +119,36 @@ absl::Status SetAad(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
     }
     if (vec.iov_base == nullptr) {
       return absl::Status(absl::StatusCode::kInvalidArgument,
-                          "Non-zero aad length but aad is nullptr.");
+                          "non-zero aad length but aad is nullptr.");
+    }
+
+    size_t aad_bytes_read = 0;
+    if (!EVP_EncryptUpdate(ctx, /*out=*/nullptr,
+                           reinterpret_cast<int*>(&aad_bytes_read),
+                           static_cast<uint8_t*>(vec.iov_base),
+                           static_cast<int>(vec.iov_len)) ||
+        aad_bytes_read != vec.iov_len) {
+      return absl::Status(
+          absl::StatusCode::kInternal,
+          "Setting authenticated associated data failed. " + GetSSLErrors());
+    }
+  }
+  return absl::Status();
+}
+
+// Sets the authentication data of |ctx| using |aad|. The caller must not pass
+// in nullptr for |ctx|.
+absl::Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+  ABSL_ASSERT(ctx != nullptr);
+  for (auto& vec : aad) {
+    // If |vec| has no content, proceed to the next |Iovec|. If the length of
+    // |vec| is nonzero, then |vec.iov_base| must not be nullptr.
+    if (vec.iov_len == 0) {
+      continue;
+    }
+    if (vec.iov_base == nullptr) {
+      return absl::Status(absl::StatusCode::kInvalidArgument,
+                          "non-zero aad length but aad is nullptr.");
     }
 
     size_t aad_bytes_read = 0;
@@ -166,7 +195,7 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
     }
 
     // Set the authentication data using |aad|.
-    absl::Status aad_status = SetAad(ctx_.get(), aad);
+    absl::Status aad_status = SetAadForEncrypt(ctx_.get(), aad);
     if (!aad_status.ok()) {
       return CrypterStatus(aad_status, /*bytes_written=*/0);
     }
@@ -235,7 +264,7 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
     if (remaining_ciphertext_length < kChachaPolyTagSize) {
       return CrypterStatus(
           absl::InvalidArgumentError(
-              "|ciphertext_and_tag| is too small to hold a tag."),
+              "|ciphertext_and_tag| is too small to hold the resulting ciphertext and tag."),
           /*bytes_written=*/0);
     }
     if (!EVP_CIPHER_CTX_ctrl(ctx_.get(), EVP_CTRL_GCM_GET_TAG,
@@ -280,7 +309,7 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
     }
 
     // Set the authentication data using |aad|.
-    absl::Status aad_status = SetAad(ctx_.get(), aad);
+    absl::Status aad_status = SetAadForDecrypt(ctx_.get(), aad);
     if (!aad_status.ok()) {
       return CrypterStatus(aad_status, /*bytes_written=*/0);
     }
@@ -293,7 +322,7 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
     size_t current_ciphertext_length = 0;
     size_t i;
     for (i = 0; i < ciphertext_and_tag.size(); i++) {
-      if (total_ciphertext_and_tag_length <= kAesGcmTagSize) {
+      if (total_ciphertext_and_tag_length <= kChachaPolyTagSize) {
         break;
       }
 
@@ -390,7 +419,7 @@ CreateChachaPolyAeadCrypter(const std::vector<uint8_t>& key) {
     return absl::InvalidArgumentError("Key size is unsupported.");
   }
   const EVP_CIPHER* cipher = nullptr;
-#ifndef OPENSSL_NO_POLY1305
+#if !defined(OPENSSL_NO_CHACHA) && !defined(OPENSSL_NO_POLY1305)
   cipher = EVP_chacha20_poly1305();
 #else
   return absl::FailedPreconditionError(

@@ -20,9 +20,9 @@
 
 #include "crypto/s2a_aead_crypter.h"
 #include "crypto/s2a_aead_crypter_test_util.h"
-#include "test_util/s2a_test_util.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "test_util/s2a_test_util.h"
 
 namespace s2a {
 namespace aead_crypter {
@@ -246,6 +246,8 @@ TEST_F(AesGcmS2AAeadCrypterFailureTest, DecryptPlaintextTooSmall) {
 class AesGcmS2AAeadCrypterTestVectors : public ::testing::Test {
  public:
   void DoEncryptDecrypt(const AesGcmTestVector& test_vector) {
+    std::cerr << "Running DoEncryptDecrypt with test vector id: %d"
+              << static_cast<int>(test_vector.id) << std::endl;
     size_t ciphertext_and_tag_length =
         crypter_->MaxCiphertextAndTagLength(test_vector.data.size());
     std::vector<uint8_t> encrypted_data(ciphertext_and_tag_length);

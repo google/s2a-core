@@ -43,3 +43,24 @@ http_archive(
     url = "https://github.com/google/boringssl/archive/597b810379e126ae05d32c1d94b1a9464385acd0.zip",
     sha256 = "c4e8414cb36e62d2fee451296cc864f7ad1a4670396c8a67e1ee77ae84cc4167",
 )
+
+# Rules foreign, needed to convert OpenSSL CMake to Bazel.
+http_archive(
+    name = "rules_foreign_cc",
+    strip_prefix = "rules_foreign_cc-master",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/master.zip",
+)
+
+load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
+rules_foreign_cc_dependencies()
+
+_ALL_CONTENT = """filegroup(name = "all", srcs = glob(["**"]), visibility = ["//visibility:public"])"""
+
+# OpenSSL
+http_archive(
+    name = "openssl",
+    build_file_content = _ALL_CONTENT,
+    strip_prefix = "openssl-OpenSSL_1_1_1f",
+    urls = ["https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.tar.gz"]
+)
+

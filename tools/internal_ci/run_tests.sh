@@ -14,8 +14,19 @@ fail_with_debug_output() {
   exit 1
 }
 
-run_tests() {
+run_tests_on_linux() {
   local -a TEST_FLAGS=( --strategy=TestRunner=standalone --test_output=all )
+  readonly TEST_FLAGS
+  (
+    time bazel build --features=-debug_prefix_map_pwd_is_dot -- ... || fail_with_debug_output
+    time bazel test --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+  )
+}
+
+run_tests_on_macos() {
+  # The OpenSSL library used in OpenSSL-specific tests is only configured to run
+  # on Linux, so omit targets with the "openssl" tag.
+  local -a TEST_FLAGS=( --strategy=TestRunner=standalone --test_output=all --test_tag_filters=-openssl --build_tag_filters=-openssl)
   readonly TEST_FLAGS
   (
     time bazel build --features=-debug_prefix_map_pwd_is_dot -- ... || fail_with_debug_output
@@ -61,7 +72,18 @@ main() {
   echo "using protoc: $(which protoc)"
   protoc --version
 
-  run_tests
+  case "${PLATFORM}" in
+    'linux')
+      run_tests_on_linux
+      ;;
+    'darwin')
+      run_tests_on_macos
+      ;;
+    *)
+      echo "Unsupported platform, unable to install protoc."
+      exit 1
+      ;;
+  esac
 }
 
 main "$@"

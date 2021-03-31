@@ -172,6 +172,7 @@ configure_make(
             "libcrypto.so",
         ],
     }),
+    tags = ["openssl"],
 )
 
 cc_library(
@@ -185,6 +186,7 @@ cc_library(
         "s2a_aead_constants.h",
         "s2a_aead_crypter.h",
     ],
+    tags = ["openssl"],
     deps = [
         ":openssl",
         ":s2a_aead_crypter_util",
@@ -206,6 +208,7 @@ cc_library(
         "s2a_aead_constants.h",
         "s2a_aead_crypter.h",
     ],
+    tags = ["openssl"],
     deps = [
         ":openssl",
         "@com_google_absl//absl/memory",
@@ -218,6 +221,7 @@ cc_library(
 cc_test(
     name = "aes_gcm_crypter_openssl_test",
     srcs = ["aes_gcm_crypter_test.cc"],
+    tags = ["openssl"],
     deps = [
         ":aes_gcm_crypter_openssl",
         ":s2a_aead_crypter_test_util",
@@ -229,6 +233,7 @@ cc_test(
 cc_test(
     name = "chacha_poly_crypter_openssl_test",
     srcs = ["chacha_poly_crypter_test.cc"],
+    tags = ["openssl"],
     deps = [
         ":chacha_poly_crypter_openssl",
         ":s2a_aead_crypter_test_util",

@@ -171,7 +171,7 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, EncryptionFailure) {
                                     plaintext_vec, ciphertext_and_tag);
   EXPECT_THAT(encrypt_status.GetStatus(),
               StatusIs(StatusCode::kInvalidArgument,
-                       "non-zero aad length but aad is nullptr."));
+                       "non-zero aad length but |aad| is nullptr."));
 }
 
 TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
@@ -223,19 +223,18 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
   std::vector<uint8_t> invalid_nonce = {'a', 'b', 'c'};
   S2AAeadCrypter::CrypterStatus decrypt_status = crypter->Decrypt(
       invalid_nonce, /*aad=*/{}, /*ciphertext_and_tag=*/{}, plaintext);
-  EXPECT_THAT(
-      decrypt_status.GetStatus(),
-      StatusIs(StatusCode::kInvalidArgument, "|nonce| has invalid length."));
+  // Error messages for |decrypt_status.GetStatus()| are different when built
+  // against OpenSSL vs. BoringSSL.
+  EXPECT_EQ(decrypt_status.GetStatus().code(), StatusCode::kInvalidArgument);
 
   // Ciphertext and tag buffer is nullptr.
   std::vector<Iovec> invalid_ciphertext_and_tag_vec = {
       {/*iov_base=*/nullptr, /*iov_len=*/10}};
   decrypt_status = crypter->Decrypt(RFC7539_test_vec1_nonce, /*aad=*/{},
                                     invalid_ciphertext_and_tag_vec, plaintext);
-  EXPECT_THAT(
-      decrypt_status.GetStatus(),
-      StatusIs(StatusCode::kInvalidArgument,
-               "non-zero ciphertext length but ciphertext is nullptr."));
+  // Error messages for |decrypt_status.GetStatus()| are different when built
+  // against OpenSSL vs. BoringSSL.
+  EXPECT_EQ(decrypt_status.GetStatus().code(), StatusCode::kInvalidArgument);
 
   // Ciphertext is too small to hold a tag.
   std::vector<Iovec> short_ciphertext_and_tag_vec;
@@ -264,10 +263,9 @@ TEST(ChachaPolyS2AAeadCrypterDeathTest, DecryptionFailure) {
   short_plaintext.iov_len = short_plaintext_buf.size();
   decrypt_status = crypter->Decrypt(RFC7539_test_vec1_nonce, /*aad=*/{},
                                     ciphertext_and_tag_vec, short_plaintext);
-  EXPECT_THAT(
-      decrypt_status.GetStatus(),
-      StatusIs(StatusCode::kInvalidArgument,
-               "|plaintext| is too small to hold the resulting plaintext."));
+  // Error messages for |decrypt_status.GetStatus()| are different when built
+  // against OpenSSL vs. BoringSSL.
+  EXPECT_EQ(decrypt_status.GetStatus().code(), StatusCode::kInvalidArgument);
 
   // Additional data buffer is nullptr.
   std::vector<Iovec> invalid_aad_vec = {{/*iov_base=*/nullptr, /*iov_len=*/10}};
@@ -378,6 +376,9 @@ TEST(ChachaPolyS2AAeadCrypterTest, EncryptionDecryptionSuccess) {
 class ChaChaPolyS2AAeadCrypterTestVectors : public ::testing::Test {
  public:
   void DoEncryptDecrypt(const ChachaPolyTestVector& test_vector) {
+    std::cerr << "Running DoEncryptDecrypt with test vector id: %d"
+              << static_cast<int>(test_vector.id) << std::endl;
+
     // Encryption.
     size_t ciphertext_and_tag_length =
         crypter_->MaxCiphertextAndTagLength(test_vector.data.size());

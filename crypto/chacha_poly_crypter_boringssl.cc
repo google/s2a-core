@@ -101,7 +101,7 @@ class ChachaPolyS2AAeadCrypterBoringSSL : public S2AAeadCrypter {
     for (auto& vec : aad) {
       if (vec.iov_len != 0 && vec.iov_base == nullptr) {
         return CrypterStatus(Status(StatusCode::kInvalidArgument,
-                                    "non-zero aad length but aad is nullptr."),
+                                    "non-zero aad length but |aad| is nullptr."),
                              /*bytes_written=*/0);
       }
       if (vec.iov_len == 0) {

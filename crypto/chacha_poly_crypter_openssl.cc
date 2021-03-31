@@ -56,8 +56,9 @@ absl::Status EncryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
   }
   if (!EVP_EncryptInit_ex(ctx, /*cipher=*/nullptr, /*impl=*/nullptr,
                           /*key=*/nullptr, nonce.data())) {
-    return absl::Status(absl::StatusCode::kInternal,
-                        "Initializing Chacha-Poly nonce failed. " + GetSSLErrors());
+    return absl::Status(
+        absl::StatusCode::kInternal,
+        "Initializing Chacha-Poly nonce failed. " + GetSSLErrors());
   }
   return absl::Status();
 }
@@ -73,8 +74,9 @@ absl::Status DecryptInitContextUsingNonce(EVP_CIPHER_CTX* ctx,
   }
   if (!EVP_DecryptInit_ex(ctx, /*cipher=*/nullptr, /*impl=*/nullptr,
                           /*key=*/nullptr, nonce.data())) {
-    return absl::Status(absl::StatusCode::kInternal,
-                        "Initializing ChachaPoly nonce failed. " + GetSSLErrors());
+    return absl::Status(
+        absl::StatusCode::kInternal,
+        "Initializing ChachaPoly nonce failed. " + GetSSLErrors());
   }
   return absl::Status();
 }
@@ -109,7 +111,8 @@ absl::Status DecryptCheckTagAndFinalize(EVP_CIPHER_CTX* ctx, Iovec tag,
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-absl::Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+absl::Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx,
+                              const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of
@@ -119,7 +122,7 @@ absl::Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad
     }
     if (vec.iov_base == nullptr) {
       return absl::Status(absl::StatusCode::kInvalidArgument,
-                          "non-zero aad length but aad is nullptr.");
+                          "non-zero aad length but |aad| is nullptr.");
     }
 
     size_t aad_bytes_read = 0;
@@ -138,7 +141,8 @@ absl::Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-absl::Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+absl::Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx,
+                              const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of
@@ -148,7 +152,7 @@ absl::Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad
     }
     if (vec.iov_base == nullptr) {
       return absl::Status(absl::StatusCode::kInvalidArgument,
-                          "non-zero aad length but aad is nullptr.");
+                          "non-zero aad length but |aad| is nullptr.");
     }
 
     size_t aad_bytes_read = 0;
@@ -211,7 +215,8 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
       if (vec.iov_len == 0) continue;
       if (vec.iov_base == nullptr) {
         return CrypterStatus(
-            absl::InvalidArgumentError("|plaintext| has an invalid component."),
+            absl::InvalidArgumentError(
+                "non-zero plaintext length but plaintext is nullptr."),
             /*bytes_written=*/0);
       }
 
@@ -263,8 +268,8 @@ class ChachaPolyS2AAeadCrypterOpenSSL : public S2AAeadCrypter {
     // authentication tag. If so, write the tag.
     if (remaining_ciphertext_length < kChachaPolyTagSize) {
       return CrypterStatus(
-          absl::InvalidArgumentError(
-              "|ciphertext_and_tag| is too small to hold the resulting ciphertext and tag."),
+          absl::InvalidArgumentError("|ciphertext_and_tag| is too small to "
+                                     "hold the resulting ciphertext and tag."),
           /*bytes_written=*/0);
     }
     if (!EVP_CIPHER_CTX_ctrl(ctx_.get(), EVP_CTRL_GCM_GET_TAG,

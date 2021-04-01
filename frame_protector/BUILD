@@ -51,8 +51,6 @@ cc_test(
         "//:s2a_constants",
         "//record_protocol:s2a_crypter",
         "//test_util:s2a_test_data",
-        "@boringssl//:crypto",
-        "@boringssl//:ssl",
         "@com_google_absl//absl/status:statusor",
         "@com_google_googletest//:gtest_main",
     ],

@@ -20,6 +20,7 @@
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -33,7 +34,8 @@ TEST(GetSSLErrorsTest, SSLErrorEmpty) {
 }
 
 TEST(GetSSLErrorsTest, SSLErrorNotEmpty) {
-  ERR_put_error(SSL, SSL_R_SSL_HANDSHAKE_FAILURE);
+  ERR_put_error(ERR_LIB_SSL, 0, SSL_R_SSL_HANDSHAKE_FAILURE, __FILE__,
+                __LINE__);
 
   std::string error = GetSSLErrors();
   EXPECT_TRUE(!error.empty());

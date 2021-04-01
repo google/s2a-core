@@ -16,11 +16,12 @@
  *
  */
 
+#include <openssl/bio.h>
+
 #ifdef OPENSSL_IS_BORINGSSL
 
 #include <openssl/base.h>
-#include <openssl/bio.h>
-#include <openssl/aead.hi>
+#include <openssl/aead.h>
 #include <vector>
 
 #include "absl/memory/memory.h"

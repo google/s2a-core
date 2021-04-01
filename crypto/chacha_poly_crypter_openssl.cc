@@ -29,21 +29,11 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/substitute.h"
 #include "crypto/s2a_aead_crypter.h"
+#include "crypto/s2a_aead_crypter_util.h"
 
 namespace s2a {
 namespace aead_crypter {
 namespace {
-
-// TODO(matthewstevenson88) Use s2a_aead_crypter_util.{h,cc} instead.
-std::string GetSSLErrors() {
-  BIO* bio = BIO_new(BIO_s_mem());
-  ERR_print_errors(bio);
-  char* temp_buffer = nullptr;
-  size_t temp_buffer_length = BIO_get_mem_data(bio, &temp_buffer);
-  std::string error_message(temp_buffer, temp_buffer_length);
-  BIO_free_all(bio);
-  return error_message;
-}
 
 // Initialize |ctx| for encryption using |nonce|. The caller must not pass in
 // nullptr for |ctx|.

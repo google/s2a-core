@@ -16,17 +16,17 @@
  *
  */
 
-#include <memory>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <memory>
 
-#include "crypto/s2a_aead_crypter.h"
-#include "crypto/s2a_aead_crypter_util.h"
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
+#include "crypto/s2a_aead_crypter.h"
+#include "crypto/s2a_aead_crypter_util.h"
 
 namespace s2a {
 namespace aead_crypter {
@@ -97,7 +97,8 @@ static Status DecryptCheckTagAndFinalize(EVP_CIPHER_CTX* ctx, Iovec tag,
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-static Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+static Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx,
+                               const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of
@@ -126,7 +127,8 @@ static Status SetAadForEncrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aa
 
 // Sets the authentication data of |ctx| using |aad|. The caller must not pass
 // in nullptr for |ctx|.
-static Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx, const std::vector<Iovec>& aad) {
+static Status SetAadForDecrypt(EVP_CIPHER_CTX* ctx,
+                               const std::vector<Iovec>& aad) {
   ABSL_ASSERT(ctx != nullptr);
   for (auto& vec : aad) {
     // If |vec| has no content, proceed to the next |Iovec|. If the length of

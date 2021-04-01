@@ -203,10 +203,12 @@ cc_library(
     srcs = [
         "chacha_poly_crypter_openssl.cc",
         "s2a_aead_crypter.cc",
+        "s2a_aead_crypter_util.cc",
     ],
     hdrs = [
         "s2a_aead_constants.h",
         "s2a_aead_crypter.h",
+        "s2a_aead_crypter_util.h",
     ],
     tags = ["openssl"],
     deps = [

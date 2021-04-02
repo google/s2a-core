@@ -46,6 +46,15 @@ run_tests_on_macos() {
 
     echo "Running tests..."
     time bazel test --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+
+    echo "Running ASAN tests..."
+    time bazel test --config=asan_macos --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+
+    echo "Running MSAN tests..."
+    time bazel test --config=msan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+
+    echo "Running TSAN tests..."
+    time bazel test --config=tsan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
   )
 }
 

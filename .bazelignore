@@ -1,0 +1,8 @@
+bazel-bin
+bazel-s2a-core
+bazel-out
+bazel-testlogs
+third_party/abseil-cpp
+third_party/boringssl
+third_party/googletest
+third_party/upb

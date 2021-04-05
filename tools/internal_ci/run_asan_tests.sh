@@ -18,11 +18,8 @@ run_tests_on_linux() {
   local -a TEST_FLAGS=( --strategy=TestRunner=standalone --test_output=all )
   readonly TEST_FLAGS
   (
-    echo "Building..."
-    time bazel build --features=-debug_prefix_map_pwd_is_dot -- ... || fail_with_debug_output
-
-    echo "Running tests..."
-    time bazel test --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+    echo "Running ASAN tests..."
+    time bazel test --config=asan --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
   )
 }
 
@@ -32,11 +29,8 @@ run_tests_on_macos() {
   local -a TEST_FLAGS=( --strategy=TestRunner=standalone --test_output=all --test_tag_filters=-openssl --build_tag_filters=-openssl)
   readonly TEST_FLAGS
   (
-    echo "Building..."
-    time bazel build --features=-debug_prefix_map_pwd_is_dot -- ... || fail_with_debug_output
-
-    echo "Running tests..."
-    time bazel test --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
+    echo "Running ASAN tests..."
+    time bazel test --config=asan_macos --features=-debug_prefix_map_pwd_is_dot "${TEST_FLAGS[@]}" -- ... || fail_with_debug_output
   )
 }
 

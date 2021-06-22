@@ -38,6 +38,7 @@ case "${PLATFORM}" in
     cmake . -DDEFINE_S2A_CORE_USE_NEW_UPB_APIS=1 -DCMAKE_CXX_STANDARD=11 -DCMAKE_CXX_FLAGS="-Wno-unused-result"
   ;;
   'darwin')
+    brew update
     brew install openssl
     brew link openssl --force
     echo "================================= Running cmake"

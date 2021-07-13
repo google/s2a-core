@@ -38,6 +38,11 @@ case "${PLATFORM}" in
     cmake . -DDEFINE_S2A_CORE_USE_NEW_UPB_APIS=1 -DCMAKE_CXX_STANDARD=11 -DCMAKE_CXX_FLAGS="-Wno-unused-result"
   ;;
   'darwin')
+    brew update
+    rm '/usr/local/bin/2to3'
+    brew unlink ilmbase
+    rm '/usr/local/bin/protoc'
+    #sudo chmod -R g+w /usr/local
     brew install openssl
     brew link openssl --force
     echo "================================= Running cmake"
